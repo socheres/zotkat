@@ -245,6 +245,8 @@ var journalMapping = {
 	"1344-7297" : "!034203265!", // The Japan mission journal
 	"0030-5839" : "!015236277!", // The Orthodox word
 	"1550-0195" : "!059006382!", // Journal of Unitarian Universalist History
+	"0014-701X" : "!015239004!", // Faith and freedom
+	"0283-8486" : "!017931495!", // Journal of prehistoric religion
 	"0082-7118" : "!015195775!", // Tyndale Bulletin
 	"2326-6236" : "!014891263!", // The jurist: studies in church law and ministry
 	"2363-6696" : "!416961657!", // Entangled Religions
@@ -590,7 +592,7 @@ var issnPhysicalFormMapping = {
 	"1344-7297" : "A", // The Japan mission journal
 	"0030-5839" : "A", // The Orthodox word
 	"1550-0195" : "A", // Journal of Unitarian Universalist History
-	"0014-701X" : "A", // Faith and freedom
+	"0014-701X" : "A", // Faith and freedom - ab dieser Zeile fehlen Einträge in ISSN-PPN-Konkordanz!!
 	"0283-8486" : "A", // Journal of prehistoric religion
 	"0342-2356" : "A", // Ugarit-Forschungen
 	"0039-338X" : "A", // Studia theologica
@@ -674,7 +676,7 @@ var issnPhysicalFormMapping = {
 	"1570-0720" : "A", // Vigiliae Christianae !!eppn
 	"1570-0631" : "A", // Journal for the study of Judaism !!eppn
 	"0091-6471" : "A", // Journal of psychology and theology !!pppn - in Z. 61 mit ppn gemappt: diese Z. löschen?
-	"00916471" : "A", // Journal of psychology and theology ohne Bindestrich
+	"00916471"  : "A", // Journal of psychology and theology
 	"1552-146X" : "A", // The Hastings Center report !!eppn
 	"0098-9444" : "A", // Biblical archaeology review !!pppn
 	"0098-9444" : "A", // Biblical archaeology review !!eppn
