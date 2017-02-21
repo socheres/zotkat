@@ -676,7 +676,7 @@ var issnPhysicalFormMapping = {
 	"1570-0720" : "A", // Vigiliae Christianae !!eppn
 	"1570-0631" : "A", // Journal for the study of Judaism !!eppn
 	"0091-6471" : "A", // Journal of psychology and theology !!pppn - in Z. 61 mit ppn gemappt: diese Z. löschen?
-	"0091-6471" : "A", // Journal of psychology and theology ohne Bindestrich
+	"00916471"  : "A", // Journal of psychology and theology
 	"1552-146X" : "A", // The Hastings Center report !!eppn
 	"0098-9444" : "A", // Biblical archaeology review !!pppn
 	"0098-9444" : "A", // Biblical archaeology review !!eppn
