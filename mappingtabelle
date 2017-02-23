@@ -348,13 +348,13 @@ var issnLangMapping = {
 };
 
 var issnVolumeMapping = {
-	"2031-5929" : "N.S.",
+	"2031-5929" : "N.S.", // Annali di scienze religiose
 	"2031-5922" : "A.S.",
 };
 
 var issnPhysicalFormMapping = {
 	"1550-0195" : "O", // Journal of Unitarian Universalist History
-	"2031-5929" : "A",
+	"2031-5929" : "A", // Annali di scienze religiose - hierzu fehlt das ISSN-PPN-Mapping!
 	"2032-5215" : "O", // ET-Studies Online Publikation - weiter unten gleiche Zs mit "A"
 	"0021-9231" : "A", // Journal of Biblical Literature  http://swb.bsz-bw.de/DB=2.1/PPNSET?PPN=014411350&INDEXSET=1,
 	"0591-2385" : "A", // Zygon 
@@ -607,7 +607,7 @@ var issnPhysicalFormMapping = {
 	"1187-7863" : "A", // Journal of agricultural and environmental ethics !!pppn
 	"1573-322X" : "A", // Journal of agricultural and environmental ethics !!eppn
 	"1468-2265" : "A", // Heythrop journal !!eppn
-	"1468-0025" : "A", // Modern theology !!eppn
+	"1468-0025" : "A", // Modern theology !!eppn - s.o. Z. 516: hier löschen?
 	"0031-2789" : "A", // Pastoral psychology !!pppn
 	"1573-6679" : "A", // Pastoral psychology !!eppn
 	"1364-436X" : "A", // International journal of children's spirituality !!pppn
@@ -703,7 +703,6 @@ var issnPhysicalFormMapping = {
 	"1574-3012" : "A", // Religion & theology !!eppn
 	"1052-150X" : "A", // Business ethics quarterly !!pppn
 	"2153-3326" : "A", // Business ethics quarterly !!eppn
-	"1094-2076" : "A", // Near Eastern archaeology !!pppn
 	"1354-9901" : "A", // Studies in world christianity !!pppn
 	"1355-8358" : "A", // Theology & sexuality !!pppn
 	"1363-013X" : "A", // Quaker studies !!pppn
@@ -725,8 +724,8 @@ var issnPhysicalFormMapping = {
 };
 
 var issnLicenceFieldMapping = {
-	"1550-0195" : "l",
-	"2031-5929" : "l",
+	"1550-0195" : "l", // Journal of Unitarian Universalist History
+	"2031-5929" : "l", // Annali di scienze religiose
 	"1661-3317" : "l", // Lectio difficilior !!eppn
 	"2363-6696" : "l", // Entangled Religions
 	"1862-5886" : "l", // Zeitschrift für junge Religionswissenschaft
@@ -743,7 +742,6 @@ var issnSsgMapping = {
 	"0141-6200" : "0; 1", // British Journal of Religious Education
 	"1749-4907" : "0; 1", // Journal for the study of religion, nature and culture
 	"1094-2076" : "0; 1", // Near Eastern archaeology
-	"1574-3012; 1023-0807" : "0; 1", // Religion & theology
 	"0022-5762" : "0; 1", // Judaism
 	"1570-0631" : "0; 1", // Journal for the study of Judaism
 	"0022-4480" : "0; 1", // Journal of Semitic studies !!pppn
@@ -815,4 +813,23 @@ var issnSsgMapping = {
 	"0014-701X" : "0", // Faith and freedom
 	"0283-8486" : "0", // Journal of prehistoric religion
 	"1861-5813" : "0", // Online - Heidelberg Journal of Religions on the Internet
+	"0342-2356" : "0; 1", // Ugarit-Forschungen
+	"1086-3249" : "0; 1", // Kennedy Institute of Ethics journal
+	"0889-048X" : "0; 1", // Agriculture and human values !!pppn
+	"1572-8366" : "0; 1", // Agriculture and human values !!eppn
+	"1187-7863" : "0; 1", // Journal of agricultural and environmental ethics !!pppn
+	"1573-322X" : "0; 1", // Journal of agricultural and environmental ethics !!eppn
+	"1468-2265" : "0; 1", // Heythrop journal !!eppn
+	"1364-436X" : "0; 1", // International journal of children's spirituality !!pppn
+	"0959-6410" : "0; 1", // Islam and Christian-Muslim relations !!pppn
+	"1203-1542" : "0; 1", // The journal of Hebrew scriptures !!eppn
+	"1467-9647" : "0; 1", // Teaching theology & religion !!eppn
+	"1473-4257" : "0; 1", // Journal of medical ethics !!eppn
+	"0969-7330" : "0; 1", // Nursing ethics !!pppn
+	"1477-0989" : "0; 1", // Nursing ethics !!eppn
+	"0003-097X" : "0; 1", // Bulletin of the American Schools of Oriental Research !!pppn
+	"0034-4087" : "0; 1", // Religious education !!pppn
+	"0022-0256" : "0; 1", // Journal of cuneiform studies !!pppn
+	"1552-146X" : "0; 1", // The Hastings Center report
+	"0163-4275" : "0; 1", // Environmental ethics
 };
