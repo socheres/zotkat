@@ -46,58 +46,19 @@ var issn_to_superior_ppn = {};
 var issn_to_volume = {};
 var language_to_language_code = {};
 var notes_to_ixtheo_notations = {};
+var journal_title_to_ppn = {};
+//var publication_title_to_superior_ppn = {};
 // Repository base URL
 var zts_enhancement_repo_url = 'https://raw.githubusercontent.com/ubtue/zotero-enhancement-maps/master/';
 var downloaded_map_files = 0;
-var max_map_files = 9;
+var max_map_files = 10;
 
 
 /*
     The following maps DO NOT have a corresponding file in the zts_enhancement_maps repository.
     Until they are added somewhere online for downloading, we'll use the hardcoded maps that follow:
 */
-// Mapping für JournalTitle missing ISSN >PPN
-var journal_title_to_ppn = {
-	"Perspectives in Religious Studies" : "!014809931!", //Perspectives in religious studies Print-PPN
-	"Journal of the Evangelical Theological Society" : "!345580796!", // Journal of the Evangelical Theological Society Print-PPN
-	"American Baptist Quarterly" : "!015260909!", // American Baptist Quarterly Print-PPN
-	"Churchman" : "!015191273!", // Churchman Print-PPN
-	"Liturgisches Jahrbuch" : "!014407558!", // Liturgisches Jahrbuch Print-PPN
-	"The Mennonite Quarterly Review" : "!015181278!", // The Mennonite Quarterly Review Print-PPN
-	"Journal of Theological Interpretation" : "!424663988!", // Journal of Theological Interpretation E-PPN
-	"Oriens Christianus" :"!014895242!", // Oriens Christianus Print-PPN
-	"Phronema" : "!477959601!", // Phronema E-PPN
-	"Word & World" : "!325341044!", // Word & World E-PPN
-	"Ephemerides Theologicae Lovanienses" : "!112891160!", // Ephemerides theologicae Lovanienses
-	"Lumen Vitae" : "!428280439!", // Lumen Vitae E-PPN
-	"Religion and Society" : "!015198073!", // Religion and Society Print-PPN
-	"Counseling et spiritualité / Counselling and Spirituality" : "!410016403!", // Counseling et spiritualité / Counselling and Spirituality E-PPN
-	"Detroit Baptist Seminary Journal" : "!454420730!", // Detroit Baptist Seminary Journal E-PPN
-	"One in Christ" : "!015178552!", // One in Christ Print-PPN
-	"The Reformed Theological Review" : "!42401243X!", // The Reformed Theological Review E-PPN
-	"Studies in Spirituality" : "!113564856!", // Studies in Spirituality E-PPN
-	"Philosophia Christi" : "!106362623!", // Philosophia Christi
-	"Calvin Theological Journal" : "!501717714!", // Calvin Theological Journal
-	"Anglican and Episcopal History" : "!016232976!", // Anglican and Episcopal History
-	"Foi et vie" : "!455507414!", // Foi et vie
-	"Protestantesimo" : "!015182266!", // Protestantesimo
-	"Ethical Perspectives" : "!112891179!", // Ethical Perspectives
-	"Journal of Eastern Christian Studies" : "!112891225!", // Journal of Eastern Christian Studies
-	"Antonianum" : "!014992124!", // Antonianum
-	"Dialogue & Alliance" : "!023125381!", // Dialogue & Alliance
-	"Luther" : "!014414112!", // Luther, Zeitschrift der Luthergesellschaft
-	"Journal of Eastern Christian Studies" : "!112891225!", // Journal of Eastern Christian Studies
-	"American Journal of Theology & Philosophy" : "!318814447!", // American journal of theology and philosophy
-	"Louvain Studies" : "!113144229!", // Louvain Studies
-	"ARC" : "!059754931!", // ARC
-	"Science et Esprit" : "!015183734!", // Science et Esprit
-	"Questions Liturgiques/Studies in Liturgy" : "!11395039X!", // Questions Litugiques
-	"Ons Geestelijk Erf" : "!114618771!", // Ons Geestelijk Erf
-	"Studia Canonica" : "!413867323!", // Studia Canonica
-	"Journal of Coptic Studies" : "!112891217!", // Journal of Coptic Studies
-	"Revue Théologique de Louvain" : "!379064863!", // Revue Théologique de Louvain
 
-};
 // Mapping JournalTitle>Language
 var journal_title_to_language_code = {
 	"Oriens Christianus" :"ger",
@@ -201,6 +162,12 @@ function populateISSNMaps(mapData, url) {
 		case "notes_to_ixtheo_notations.map":
             notes_to_ixtheo_notations = temp;
             break;
+        case "journal_title_to_ppn.map":
+            journal_title_to_ppn = temp;
+            break;
+        //case "publication_title_to_superior_ppn.map":
+            //publication_title_to_superior_ppn = temp;
+            //break;
         default:
             throw "Unknown map file: " + mapFilename;
     }
@@ -280,8 +247,11 @@ function performExport() {
 		var physicalForm = "";//0500 Position 1
 		var licenceField = ""; // 0500 Position 4 only for Open Access Items; http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=kat&val=4085&regelwerk=RDA&verbund=SWB
 		var SsgField = "";
-		var superiorPPN = "";
-
+        var superiorPPN = "";
+        var journalTitlePPN = "";
+		
+		if (!item.ISSN)
+				item.ISSN = "";
 		item.ISSN = ZU.cleanISSN(item.ISSN);
 		Z.debug("Item ISSN: " + item.ISSN);
 		//enrich items based on their ISSN
@@ -308,6 +278,10 @@ function performExport() {
 		if (issn_to_superior_ppn.get(item.ISSN) !== undefined) {
 			superiorPPN = issn_to_superior_ppn.get(item.ISSN);
 			Z.debug("Found superiorPPN:" + superiorPPN);
+        }
+        if (journal_title_to_ppn.get(item.publicationTitle) !== undefined) {
+			journalTitlePPN = journal_title_to_ppn.get(item.publicationTitle);
+			Z.debug("Found journalTitlePPN:" + journalTitlePPN);
         }
 
 
@@ -398,7 +372,7 @@ function performExport() {
 		/*if (physicalForm === "O") {
 			addLine(currentItemId, "1140", "text");
 		}*/
-		
+
         //item.language --> 1500 Sprachcodes
         if (item.language) {
             if (language_to_language_code.get(item.language)) {
@@ -574,14 +548,14 @@ function performExport() {
             addLine(currentItemId, "4070", volumeyearissuepage);
         }
 
-        //URL --> 4085 nur bei Dokumenttyp "magazineArticle" für Rezension im Feld 0500 K10Plus:aus 4085 wird 4950 
+        //URL --> 4085 nur bei Dokumenttyp "magazineArticle" für Rezension im Feld 0500 K10Plus:aus 4085 wird 4950
         if (item.url && item.itemType == "magazineArticle") {
             addLine(currentItemId, "4950", "$u" + item.url + "$xR"); //K10Plus:wird die URL aus dem DOI, einem handle oder einem urn gebildet, sollte es $xR heißen und nicht $xH
         }
 
-		//URL --> 4085 nur bei Satztyp "O.." im Feld 0500 K10Plus:aus 4085 wird 4950 
+		//URL --> 4085 nur bei Satztyp "O.." im Feld 0500 K10Plus:aus 4085 wird 4950
 		switch (true) {
-			case item.url && physicalForm === "O" && licenceField === "l": 
+			case item.url && physicalForm === "O" && licenceField === "l":
 				addLine(currentItemId, "4950", "$u" + item.url + "$xR$4LF");//K10Plus:0500 das "l" an der vierten Stelle entfällt, statt dessen wird $4LF in 4950 gebildet
 				break;
 			case item.url && physicalForm === "O" && licenceField === "kw":
@@ -617,7 +591,7 @@ function performExport() {
             if (superiorPPN.length != 0) {
                 addLine(currentItemId, "4241", "Enthalten in " + superiorPPN);
             } else if (item.publicationTitle) {
-                addLine(currentItemId, "4241", "Enthalten in " + journal_title_to_ppn[item.publicationTitle]);
+                addLine(currentItemId, "4241", "Enthalten in " + journalTitlePPN);
             }
 
             //4261 Themenbeziehungen (Beziehung zu der Veröffentlichung, die beschrieben wird)|case:magazineArticle
@@ -632,7 +606,7 @@ function performExport() {
             } else {
                 addLine(currentItemId, "5056", defaultSsgNummer);
             }
-			
+
             //Schlagwörter aus einem Thesaurus (Fremddaten) --> 5520 (oder alternativ siehe Mapping)
             if (issn_to_keyword_field.get(item.ISSN) !== undefined) {
                 var codeBase = issn_to_keyword_field.get(item.ISSN);
@@ -688,6 +662,8 @@ function doExport() {
             zts_enhancement_repo_url + "ISSN_to_volume.map",
             zts_enhancement_repo_url + "language_to_language_code.map",
 			zts_enhancement_repo_url + "notes_to_ixtheo_notations.map",
+			zts_enhancement_repo_url + "journal_title_to_ppn.map",
+			//zts_enhancement_repo_url + "publication_title_to_superior_ppn.map",
             ], function (responseText, request, url) {
                 switch (responseText) {
                     case "404: Not Found":
