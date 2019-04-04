@@ -47,11 +47,11 @@ var issn_to_volume = {};
 var language_to_language_code = {};
 var notes_to_ixtheo_notations = {};
 var journal_title_to_ppn = {};
-//var publication_title_to_superior_ppn = {};
+var publication_title_to_physical_form = {};
 // Repository base URL
 var zts_enhancement_repo_url = 'https://raw.githubusercontent.com/ubtue/zotero-enhancement-maps/master/';
 var downloaded_map_files = 0;
-var max_map_files = 10;
+var max_map_files = 11;
 
 
 /*
@@ -165,9 +165,9 @@ function populateISSNMaps(mapData, url) {
         case "journal_title_to_ppn.map":
             journal_title_to_ppn = temp;
             break;
-        //case "publication_title_to_superior_ppn.map":
-            //publication_title_to_superior_ppn = temp;
-            //break;
+        case "publication_title_to_physical_form.map":
+            publication_title_to_physical_form = temp;
+            break;
         default:
             throw "Unknown map file: " + mapFilename;
     }
@@ -283,6 +283,10 @@ function performExport() {
 			journalTitlePPN = journal_title_to_ppn.get(item.publicationTitle);
 			Z.debug("Found journalTitlePPN:" + journalTitlePPN);
         }
+		if (publication_title_to_physical_form.get(item.publicationTitle) !== undefined) {
+			physicalForm = publication_title_to_physical_form.get(item.publicationTitle);
+			Z.debug("Found journalTitlePPN:" + physicalForm);
+        }
 
 
 		var article = false;
@@ -309,7 +313,7 @@ function performExport() {
 				addLine(currentItemId, '0500', physicalForm+"s"+cataloguingStatus);
 				break;
 			default:
-				addLine(currentItemId, '0500', "Os"+cataloguingStatus); // //z.B. Aou, Oou, Oox etc.
+				addLine(currentItemId, '0500', physicalForm+"s"+cataloguingStatus); // //z.B. Aou, Oou, Oox etc.
 			}
         //item.type --> 0501 Inhaltstyp
         addLine(currentItemId, "0501", "Text$btxt");
@@ -663,7 +667,7 @@ function doExport() {
             zts_enhancement_repo_url + "language_to_language_code.map",
 			zts_enhancement_repo_url + "notes_to_ixtheo_notations.map",
 			zts_enhancement_repo_url + "journal_title_to_ppn.map",
-			//zts_enhancement_repo_url + "publication_title_to_superior_ppn.map",
+			zts_enhancement_repo_url + "publication_title_to_physical_form.map",
             ], function (responseText, request, url) {
                 switch (responseText) {
                     case "404: Not Found":
