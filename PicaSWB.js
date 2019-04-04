@@ -335,7 +335,7 @@ function performExport() {
 				addLine(currentItemId, '0500', physicalForm+"s"+cataloguingStatus);
 				break;
 			default:
-				addLine(currentItemId, '0500', physicalForm+"s"+cataloguingStatus); // //z.B. Aou, Oou, Oox etc.
+				addLine(currentItemId, '0500', "Os"+cataloguingStatus); // //z.B. Aou, Oou, Oox etc.
 			}
         //item.type --> 0501 Inhaltstyp
         addLine(currentItemId, "0501", "Text$btxt");
@@ -349,7 +349,7 @@ function performExport() {
                 addLine(currentItemId, "0502", "Computermedien$bc");
                 break;
             default:
-                addLine(currentItemId, "0502", "");
+                addLine(currentItemId, "0502", "Computermedien$bc");
         }
 
         //item.type --> 0503 Datenträgertyp
@@ -362,7 +362,7 @@ function performExport() {
                 addLine(currentItemId, "0503", "Online-Ressource$bcr");
                 break;
             default:
-                addLine(currentItemId, "0503", "");
+                addLine(currentItemId, "0503", "Online-Ressource$bcr");
         }
         //item.date --> 1100
         var date = Zotero.Utilities.strToDate(item.date);
@@ -419,7 +419,7 @@ function performExport() {
 
         //item.DOI --> 2051 bei "Oou" bzw. 2053 bei "Aou"
         if (item.DOI) {
-            if (physicalForm === "O") {
+            if (physicalForm === "O" || item.DOI) {
                 addLine(currentItemId, "2051", item.DOI);
             } else if (physicalForm === "A") {
                 addLine(currentItemId, "2053", item.DOI);
