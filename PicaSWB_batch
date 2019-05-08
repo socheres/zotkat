@@ -414,7 +414,7 @@ function performExport() {
                 titleStatement += "$d" + ZU.unescapeHTML(item.title.substr(item.shortTitle.length).replace(/:(?!\d)\s*/,''));
             }
         } else {
-            titleStatement += item.title.replace(/\s*:\s*/,'$d');
+            titleStatement += item.title.replace(/:(?!\d)\s*/,'$d');
         }
         //Sortierzeichen hinzufügen, vgl. https://github.com/UB-Mannheim/zotkat/files/137992/ARTIKEL.pdf
         if (item.language == "ger" || !item.language) {
@@ -459,7 +459,7 @@ function performExport() {
 
                 //Lookup für Autoren
                 if (authorName[0] != "!") {
-                    var lookupUrl = "http://swb.bsz-bw.de/DB=2.104/SET=70/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1&TRM0=" + authorName +"&ACT1=*&IKT1=2057&TRM1=*&ACT2=*&IKT2=8991&TRM2=(theolog*|neutestament*|alttestament*|kirchenhist*|judais*|Religionswi*|pfarrer*)&ACT3=*&IKT3=8991&TRM3=1[9][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9]?"
+                    var lookupUrl = "http://swb.bsz-bw.de/DB=2.104/SET=70/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1&TRM0=" + authorName +"&ACT1=*&IKT1=2057&TRM1=*&ACT2=*&IKT2=8991&TRM2=(theolog*|neutestament*|alttestament*|kirchenhist*|judais*|Religionswi*)&ACT3=-&IKT3=8991&TRM3=1[0%2C1%2C2%2C3%2C4%2C5%2C6%2C7][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9]"
 
                     /*
                     lookupUrl kann je nach Anforderung noch spezifiziert werden, im obigen Abfragebeispiel:
@@ -555,22 +555,22 @@ function performExport() {
 
         //URL --> 4085 nur bei Dokumenttyp "magazineArticle" für Rezension im Feld 0500 K10Plus:aus 4085 wird 4950 
         if (item.url && item.itemType == "magazineArticle") {
-            addLine(currentItemId, "\\n4950", "$u" + item.url + "$xR"); //K10Plus:wird die URL aus dem DOI, einem handle oder einem urn gebildet, sollte es $xR heißen und nicht $xH
+            addLine(currentItemId, "\\n4950", item.url + "$xR"); //K10Plus:wird die URL aus dem DOI, einem handle oder einem urn gebildet, sollte es $xR heißen und nicht $xH
         }
 
 		//URL --> 4085 nur bei Satztyp "O.." im Feld 0500 K10Plus:aus 4085 wird 4950 
 		switch (true) {
 			case item.url && physicalForm === "O" && licenceField === "l": 
-				addLine(currentItemId, "\\n4950", "$u" + item.url + "$xR$4LF");//K10Plus:0500 das "l" an der vierten Stelle entfällt, statt dessen wird $4LF in 4950 gebildet
+				addLine(currentItemId, "\\n4950", item.url + "$xR$4LF");//K10Plus:0500 das "l" an der vierten Stelle entfällt, statt dessen wird $4LF in 4950 gebildet
 				break;
 			case item.url && physicalForm === "O" && licenceField === "kw":
-				addLine(currentItemId, "\\n4950", "$u" + item.url + "$xR$zKW");
+				addLine(currentItemId, "\\n4950", item.url + "$xR$zKW");
 				break;
 			case item.url && physicalForm === "O":
-				addLine(currentItemId, "\\n4950", "$u" + item.url + "$xR");
+				addLine(currentItemId, "\\n4950", item.url + "$xR");
 				break;
 			case item.url && item.itemType == "magazineArticle":
-				addLine(currentItemId, "\\n4950", "$u" + item.url + "$xR");
+				addLine(currentItemId, "\\n4950", item.url + "$xR");
 				break;
 			}
         //Reihe --> 4110
