@@ -594,9 +594,9 @@ function performExport() {
         //item.publicationTitle --> 4241 Beziehungen zur größeren Einheit
         if (item.itemType == "journalArticle" || item.itemType == "magazineArticle") {
             if (superiorPPN.length != 0) {
-                addLine(currentItemId, "\\n4241", "Enthalten in " + superiorPPN);
+                addLine(currentItemId, "\\n4241", "Enthalten in" + superiorPPN);
             } else if (item.publicationTitle) {
-                addLine(currentItemId, "4241", "Enthalten in " + journalTitlePPN);
+                addLine(currentItemId, "4241", "Enthalten in" + journalTitlePPN);
             }
 
             //4261 Themenbeziehungen (Beziehung zu der Veröffentlichung, die beschrieben wird)|case:magazineArticle
