@@ -1,7 +1,7 @@
 {
-	"translatorID": "2edf7a1b-eded-48d7-ae11-7126fd1c1b07",
-	"label": "PicaSWB",
-	"creator": "Philipp Zumstein, Timotheus Kim",
+	"translatorID": "b98e97d4-44d4-43a5-9ad1-0913353249f5",
+	"label": "PicaGBV",
+	"creator": "Philipp Zumstein",
 	"target": "txt",
 	"minVersion": "3.0",
 	"maxVersion": "",
@@ -9,33 +9,40 @@
 	"inRepository": true,
 	"translatorType": 2,
 	"browserSupport": "gcs",
-	"lastUpdated": "2016-08-29 19:13:00"
+	"displayOptions": {
+		"Gedruckte Ressource": false
+	},
+	"lastUpdated": "2018-08-25 13:00:00"
 }
-
-// Zotero Export Translator für das Pica Intern Format
-// (wie es im SWB Verbund benutzt wird)
 
 
 /*
 	***** BEGIN LICENSE BLOCK *****
-	Copyright © 2016 Philipp Zumstein
+
+	Copyright © 2017 Philipp Zumstein
+
 	This file is part of Zotero.
+
 	Zotero is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Affero General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
+
 	Zotero is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 	GNU Affero General Public License for more details.
+
 	You should have received a copy of the GNU Affero General Public License
 	along with Zotero. If not, see <http://www.gnu.org/licenses/>.
+
 	***** END LICENSE BLOCK *****
 */
 
-var ssgNummer = "1";
+var ssgNummer = false;
+var exportAbstract = false;
 var defaultLanguage = "eng";
-var physicalForm = "A";//0500 Position 1
+var physicalForm = "O";//0500 Position 1
 var cataloguingStatus = "u";//0500 Position 3
 
 var journalMapping = {
@@ -82,7 +89,7 @@ function writeLine(code, line) {
 	outputText += code + " " + line + "\n";
 
 	//Lookup für Autoren
-	if ((code == "3000" || code == "3010") && line[0] != "!") {
+	/*if ((code == "3000" || code == "3010") && line[0] != "!") {
 		count++;
 		var authorName = line.substring(0,line.indexOf("$"));
 		var lookupUrl = "http://swb.bsz-bw.de/DB=2.104/SET=70/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1004&TRM0=" + authorName +"&ACT1=*&IKT1=2057&TRM1=*&ACT2=*&IKT2=8991&TRM2=*&ACT3=*&IKT3=8991&TRM3=*";
@@ -99,10 +106,13 @@ function writeLine(code, line) {
 				Zotero.write(outputText);
 			}
 		});
-	}
+	}*/
 }
 
 function doExport() {
+	if (Zotero.getOption("Gedruckte Ressource")) {
+		physicalForm = "A";
+	}
 	var item;
 	while ((item = Zotero.nextItem())) {
 		
@@ -112,6 +122,16 @@ function doExport() {
 		}
 		if (item.volume && item.ISSN && issnVolumeMapping[item.ISSN]) {
 			item.volume = issnVolumeMapping[item.ISSN] + item.volume;
+		}
+		
+		if (!item.DOI && item.extra) {
+			var extraParts = item.extra.split("\n");
+			var j;
+			for (j=0; j<extraParts.length; j++) {
+				if (extraParts[j].indexOf("DOI:") === 0) {
+					item.DOI = extraParts[j].substr(4).trim();
+				}
+			}
 		}
 
 		var article = false;
@@ -126,9 +146,9 @@ function doExport() {
 		}
 		
 		//item.type --> 0500 Bibliographische Gattung und Status
-		//http://swbtools.bsz-bw.de/winibwhelp/Liste_0500.htm
+		//https://www.gbv.de/bibliotheken/verbundbibliotheken/02Verbund/01Erschliessung/02Richtlinien/01KatRicht/0500.pdf
 		if (article) {
-			writeLine("0500", physicalForm+"o"+cataloguingStatus);//z.B. Aou, Oox
+			writeLine("0500", physicalForm+"s"+cataloguingStatus);//z.B. Osu
 		} else {
 			writeLine("0500", physicalForm+"a"+cataloguingStatus);//z.B. Aau
 		}
@@ -136,29 +156,30 @@ function doExport() {
 		//item.type --> 0501 Inhaltstyp
 		writeLine("0501", "Text$btxt");
 		
-		//item.type --> 0502 Medientyp
-		writeLine("0502", "ohne Hilfsmittel zu benutzen$bn");
+		if (physicalForm === "A") {
 		
-		//item.type --> 0503 Datenträgertyp
-		writeLine("0503", "Band$bnc");
+			//item.type --> 0502 Medientyp
+			writeLine("0502", "ohne Hilfsmittel zu benutzen$bn");
+			
+			//item.type --> 0503 Datenträgertyp
+			writeLine("0503", "Band$bnc");
+			
+		}
+		
+		if (physicalForm === "O") {
+		
+			//item.type --> 0502 Medientyp
+			writeLine("0502", "Computermedien$bc");
+			
+			//item.type --> 0503 Datenträgertyp
+			writeLine("0503", "Online-Ressource$bcr");
+			
+		}
 		
 		//item.date --> 1100 
 		var date = Zotero.Utilities.strToDate(item.date);
 		if (date.year !== undefined) {
-			writeLine("1100", date.year.toString() + "$n[" + date.year.toString() + "] \n");
-		}
-		
-		//1130 Datenträger
-		//http://swbtools.bsz-bw.de/winibwhelp/Liste_1130.htm
-		switch (physicalForm) {
-			case "A":
-				writeLine("1130", "druck");
-				break;
-			case "O":
-				writeLine("1130", "cofz");
-				break;
-			default:
-				writeLine("1130", "");
+			writeLine("1100", date.year.toString() + "$n[" + date.year.toString() + "]");
 		}
 		
 		//1131 Art des Inhalts
@@ -185,17 +206,21 @@ function doExport() {
 		writeLine("1505", "$erda");
 		
 		//item.ISBN --> 2000 ISBN
-		if (item.ISBN) {
+		if (item.ISBN && physicalForm === "A" && !article) {
 			writeLine("2000", item.ISBN);
 		}
 		
 		//item.DOI --> 2051 bei "Oou" bzw. 2053 bei "Aou"
-		if (item.DOI) {
-			if (physicalForm === "O") {
-				writeLine("2051", item.DOI);
-			} else if (physicalForm === "A") {
-				writeLine("2053", item.DOI);
+		//http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=kat&val=2051&regelwerk=RDA&verbund=GBV
+		if (physicalForm === "O") {
+			//Feld 2051 soll immer ausgegeben werden,
+			//auch wenn kein Wert ermittelt werden konnte
+			if (!item.DOI) {
+				item.DOI = "";
 			}
+			writeLine("2051", item.DOI);
+		} else if (physicalForm === "A") {
+			writeLine("2053", item.DOI);
 		}
 		
 		//Autoren --> 3000, 3010
@@ -241,11 +266,31 @@ function doExport() {
 					titleStatement += "$h" + (creator.firstName ? creator.firstName + " " : "") + creator.lastName;
 				} else {
 					writeLine("3010", content + "$BVerfasserIn$4aut");
+					titleStatement += ", " + (creator.firstName ? creator.firstName + " " : "") + creator.lastName;
 				}
 				i++;
 			}
 			//TODO: editors, other contributors...
 		}
+		
+		//3290
+		if (item.itemType == "bookSection") {
+			var container = "";
+			if (item.publicationTitle) {
+				container += item.publicationTitle;
+			}
+			if (item.place) {
+				container += "$p" + item.place;
+			}
+			if (item.publisher) {
+				container += "$n" + item.publisher;
+				if (item.ISBN) {
+					container += " " + item.ISBN;
+				}
+			}
+			writeLine("3290", container);
+		}
+		
 		writeLine("4000", titleStatement);
 		
 		//Ausgabe --> 4020
@@ -261,20 +306,28 @@ function doExport() {
 			writeLine("4030", publicationStatement);
 		}
 		
-		//4070 $v Bandzählung $j Jahr $h Heftnummer $p Seitenzahl
-		if (item.itemType == "journalArticle" || item.itemType == "magazineArticle") {
+		//Angaben zu illustrierendem Inhalt, muss händisch weiter gefüllt werden
+		writeLine("4061", "");
+		
+		//4070 $v Bandzählung $j Jahr $a Heftnummer $p Seitenzahl
+		if (item.itemType == "journalArticle" || item.itemType == "magazineArticle" || item.itemType == "bookSection") {
 			var volumeyearissuepage = "";
 			if (item.volume) { volumeyearissuepage += "$v" + item.volume; }
 			if (date.year !== undefined) { volumeyearissuepage +=  "$j" + date.year; }
-			if (item.issue) { volumeyearissuepage += "$h" + item.issue; }
+			if (item.issue) { volumeyearissuepage += "$a" + item.issue; }
 			if (item.pages) { volumeyearissuepage += "$p" + item.pages; }
 			
 			writeLine("4070", volumeyearissuepage);
 		}
 		
-		//URL --> 4085 nur bei Katalogisierung nach "Oox" im Feld 0500
-		if (item.url && physicalForm == "O") {
-			writeLine("4085", item.url + "$xH");
+		//URL --> 4083
+		if (physicalForm == "O") {
+			if (item.DOI && item.DOI !== "") {
+				writeLine("4083", "$ahttps://doi.org/" + item.DOI);
+			} else if (item.url) {
+				if (item.url)
+				writeLine("4083", "$a" + item.url);
+			}
 		}
 		
 		//Reihe --> 4110
@@ -289,17 +342,24 @@ function doExport() {
 			writeLine("4110", seriesStatement);
 		}
 		
-		//Inhaltliche Zusammenfassung -->4207
-		if (item.abstractNote) {
-			writeLine("4207", item.abstractNote);
+		//Sonstige Anmerkungen (manuell eintragen) --> 4201
+		writeLine("4201", "");
+		
+		//Inhaltliche Zusammenfassung --> 4207/4209
+		if (item.abstractNote && exportAbstract) {
+			if (item.abstractNote.length <= 600) {
+				writeLine("4207", item.abstractNote);
+			} else {
+				writeLine("4209", item.abstractNote);
+			}
 		}
 		
 		//item.publicationTitle --> 4241 Beziehungen zur größeren Einheit 
-		if (item.itemType == "journalArticle" || item.itemType == "magazineArticle") {
+		if (item.itemType == "journalArticle" || item.itemType == "magazineArticle" || item.itemType == "bookSection") {
 			if (item.ISSN && journalMapping[ZU.cleanISSN(item.ISSN)]) {
 				writeLine("4241", "Enthalten in" + journalMapping[ZU.cleanISSN(item.ISSN)]);
-			} else if (item.publicationTitle) {
-				writeLine("4241", "Enthalten in"  + item.publicationTitle);
+			} else {
+				writeLine("4241", "Enthalten in!PPN!");
 			}
 		}
 		
@@ -319,13 +379,14 @@ function doExport() {
 		}
 		
 		// 0999 verify outputText ppn in OGND
-		var ppnVerify1 = "http://swb.bsz-bw.de/DB=2.104/SET=1/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1004&TRM0=" + content + "&ACT1=*&IKT1=2057&TRM1=3.*&ACT2=*&IKT2=8991&TRM2=19**&ACT3=%2B&IKT3=4060&TRM3=tpv*&ACT4=%2B&IKT4=8991&TRM4=theol* neutestament*&ACT5=*&IKT5=1004&TRM5=" +  content;
+		/*var ppnVerify1 = "http://swb.bsz-bw.de/DB=2.104/SET=1/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1004&TRM0=" + content + "&ACT1=*&IKT1=2057&TRM1=3.*&ACT2=*&IKT2=8991&TRM2=19**&ACT3=%2B&IKT3=4060&TRM3=tpv*&ACT4=%2B&IKT4=8991&TRM4=theol* neutestament*&ACT5=*&IKT5=1004&TRM5=" +  content;
 		var ppnVerify2 = "http://swb.bsz-bw.de/DB=2.104/SET=1/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1004&TRM0=" + creator.lastName + "&ACT1=*&IKT1=2057&TRM1=3.*&ACT2=*&IKT2=8991&TRM2=19**&ACT3=%2B&IKT3=4060&TRM3=tpv*&ACT4=%2B&IKT4=8991&TRM4=theol* neutestament*&ACT5=*&IKT5=1004&TRM5=" + creator.lastName;
 		if (item.creators) {
 			 ppnVerify1 += item.creators;
 		}
 		writeLine("\n" + "0999 ".fontcolor("green") + "MAPPING_BEDINGUNG > NACHNAME, VORNAME |AND| sn3.* |AND| 19** |OR| tpv* |OR| theol* neutestament*| VERIFY OUTPUT PPN IN OGND | LINK:   ".fontcolor("green"), ppnVerify1.link(ppnVerify1));
 		writeLine("\n" + "0999 ".fontcolor("green") + "MAPPING_BEDINGUNG > NACHNAME |AND| sn3.* |AND| 19** |OR| tpv* |OR| theol* neutestament*| VERIFY OUTPUT PPN IN OGND | LINK:   ".fontcolor("green"), ppnVerify2.link(ppnVerify2) + "\n");
+		*/
 	}
 	outputText += "\n";
 	
