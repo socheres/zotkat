@@ -553,10 +553,11 @@ function performExport() {
         }
 
         //URL --> 4085 nur bei Dokumenttyp "magazineArticle" für Rezension im Feld 0500 K10Plus:aus 4085 wird 4950
-        if (item.url && item.itemType == "magazineArticle") {
+        /*
+	if (item.url && item.itemType == "magazineArticle") {
             addLine(currentItemId, "4950", item.url + "$xR"); //K10Plus:wird die URL aus dem DOI, einem handle oder einem urn gebildet, sollte es $xR heißen und nicht $xH
         }
-
+	*/
 		//URL --> 4085 nur bei Satztyp "O.." im Feld 0500 K10Plus:aus 4085 wird 4950
 		switch (true) {
 			case item.url && physicalForm === "O" && licenceField === "l":
