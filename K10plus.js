@@ -49,22 +49,29 @@ var cataloguingStatus = "u";// 0500 Position 3
 var journalMapping = {
 	"0021-9231": "!014411350!" // Journal of Biblical Literature  http://swb.bsz-bw.de/DB=2.1/PPNSET?PPN=014411350&INDEXSET=1
 };
-var nachnameMapping = {
-	Hemingway: "!16137493X!" // http://swb.bsz-bw.de/DB=2.1/PPNSET?PPN=16137493X&INDEXSET=1
-};
-var nameMapping = {
-	"Berners-Lee, Tim": "!18195804X!", // http://swb.bsz-bw.de/DB=2.1/PPNSET?PPN=18195804X&INDEXSET=1
-	"Neuenkirch, Andreas": "!512979650!"
-};
+
 // Sprachcodes nach ISO 639-2
 // http://swbtools.bsz-bw.de/winibwhelp/Liste_1500.htm
 var languageMapping = {
-	en: "eng",
-	de: "ger",
-	fr: "fre",
-	it: "ita",
-	es: "spa",
-	pr: "por"
+	"en" : "eng",
+	"de" : "ger",
+	"fr" : "fre",
+	"English" : "eng",
+	"pt" : "por",
+	"es" : "spa",
+	"it" : "ita",
+	"en-US" : "eng",
+	"en_US" : "eng",
+	"EN" : "eng",
+	"da-DK" : "dan",
+	"da" : "dan",
+	"Da" : "dan",
+	"pt-BR" : "por",
+	"es-ES" : "spa",
+	"No" : "nor",
+	"Sv" : "swe", 
+	"no" : "nor",
+	"sv" : "swe", 
 };
 var issnLangMapping = {
 	"1010-9919": "ger",
@@ -90,16 +97,16 @@ function writeLine(code, line) {
 	
 	// Halbgeviertstrich etc. ersetzen
 	line = line.replace(/–/g, '-').replace(/’/g, '\'').replace(/œ/g, '\\u0153')
-		.replace(/ā/g, '\\u0101')
+		.replace(/a/g, '\\u0101')
 		.replace(/â/g, '\\u00E2')
-		.replace(/Ṣ/g, '\\u1E62')
-		.replace(/ṣ/g, '\\u1E63')
-		.replace(/ū/g, '\\u016B')
-		.replace(/ḥ/g, '\\u1E25')
-		.replace(/ī/g, '\\u012B')
-		.replace(/ṭ/g, '\\u1E6D')
-		.replace(/ʾ/g, '\\u02BE')
-		.replace(/ʿ/g, '\\u02BF')
+		.replace(/?/g, '\\u1E62')
+		.replace(/?/g, '\\u1E63')
+		.replace(/u/g, '\\u016B')
+		.replace(/?/g, '\\u1E25')
+		.replace(/i/g, '\\u012B')
+		.replace(/?/g, '\\u1E6D')
+		.replace(/?/g, '\\u02BE')
+		.replace(/?/g, '\\u02BF')
 		.replace(/–/g, '-')
 		.replace(/&#160;/g, "")
 		.replace(/"/g, '"')
@@ -108,6 +115,43 @@ function writeLine(code, line) {
 
 	// Text zusammensetzen
 	outputText += code + " " + line + "\n";
+	
+	//Lookup für Autoren
+	if ((code == "3000" || code == "3010") && line[0] != "!") {
+		count++;
+		var authorName = line.substring(0,line.indexOf("\n"));
+		var lookupUrl = "http://swb.bsz-bw.de/DB=2.104/SET=70/TTL=1/CMD?SGE=&ACT=SRCHM&MATCFILTER=Y&MATCSET=Y&NOSCAN=Y&PARSE_MNEMONICS=N&PARSE_OPWORDS=N&PARSE_OLDSETS=N&IMPLAND=Y&NOABS=Y&ACT0=SRCHA&SHRTST=50&IKT0=1&TRM0=" + authorName +"&ACT1=*&IKT1=2057&TRM1=*&ACT2=*&IKT2=8991&TRM2=(theolog*|neutestament*|alttestament*|kirchenhist*|judais*|Religionswi*)&ACT3=-&IKT3=8991&TRM3=1[0%2C1%2C2%2C3%2C4%2C5%2C6%2C7][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9][0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9]"
+				
+		/*lookupUrl kann je nach Anforderung noch spezifiziert werden, im obigen Abfragebeispiel: 
+		suchen [und] (Person(Phrase: Nachname, Vorname) [PER]) " Barth, Karl "
+ 		eingrenzen (Systematiknummer der SWD [SN]) *
+ 		eingrenzen (Relationierter Normsatz in der GND [RL]) (theolog*|neutestament*|alttestament*|kirchenhist*|judais*|Religionswi*)
+ 		ausgenommen (Relationierter Normsatz in der GND [RL]) 1[0,1,2,3,4,5,6,7][0,1,2,3,4,5,6,7,8,9][0,1,2,3,4,5,6,7,8,9]
+		
+		IKT0=1 > Nachname + Vorname 
+		IKT1=2057 TRM1=* > GND-Systematik
+		IKT2=8991 TRM2 > theolog*    für Berufsbezeichnung 550
+		IKT3=8991  TRM3=1[1,2,3,4,5,6,7,8][0,1,2,3,4,5,6,7,8,9][0,1,2,3,4,5,6,7,8,9] > Geburts- und Sterbedatum (Bereich)
+		
+		###OPERATOREN vor "IKT"###
+		UND-Verknüpfung "&" | ODER-Verknüpfung "%2B&" | Nicht "-&"
+		
+		###TYP IKT=Indikatoren|Zweite Spalte Schlüssel(IKT)###
+		Liste der Indikatoren und Routine http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=idx_list_typ&regelwerk=RDA&verbund=SWB
+		*/
+		
+		ZU.processDocuments([lookupUrl], function(doc, url){
+			var ppn = ZU.xpathText(doc, '//small[a[img]]');
+			if (ppn) {
+				outputText = outputText.replace(authorName, "!" + ppn.trim() + "!$BVerfasserIn$4aut \n8910 $azotkat$bAutor in der Zoterovorlage ["  + authorName + "] maschinell zugeordnet";
+			}
+		}, function() {
+			count--;
+			if (count === 0) {
+				Zotero.write(outputText);
+			}
+		});
+	}
 }
 
 function doExport() {
@@ -163,6 +207,7 @@ function doExport() {
 			// item.type --> 0503 Datenträgertyp
 			writeLine("0503", "Band$bnc");
 		}
+		
 		if (physicalForm === "O") {
 			// item.type --> 0502 Medientyp
 			writeLine("0502", "Computermedien$bc");
@@ -177,14 +222,10 @@ function doExport() {
 		}
 		
 		// 1131 Art des Inhalts
+		// da Zotero kein ItemType "Reviews" kennt, wird der Eintrag in Zotero bei Katalogisierung von Rezensionsartikeln in "magazineArticle" manuell geändert.
 		if (item.itemType == "magazineArticle") {
 			writeLine("1131", "!106186019!");
 		}
-		
-		// 1140 Veröffentlichungsart und Inhalt http://swbtools.bsz-bw.de/winibwhelp/Liste_1140.htm
-		// if (item.itemType == "magazineArticle") {
-		//	writeLine("1140", "uwre");
-		// }
 		
 		// item.language --> 1500 Sprachcodes
 		writeLine("1500", item.language || defaultLanguage);
@@ -212,11 +253,11 @@ function doExport() {
 		if (item.shortTitle) {
 			titleStatement += item.shortTitle;
 			if (item.title && item.title.length > item.shortTitle.length) {
-				titleStatement += "$d" + item.title.substr(item.shortTitle.length).replace(/^\s*:\s*/, '');
+				titleStatement += "$d" + item.title.substr(item.shortTitle.length).replace(/:(?!\d)\s*/,''));
 			}
 		}
 		else {
-			titleStatement += item.title.replace(/\s*:\s*/, '$d');
+			titleStatement += item.title.replace(/:(?!\d)\s*/,'$d')
 		}
 		// Sortierzeichen hinzufügen, vgl. https://github.com/UB-Mannheim/zotkat/files/137992/ARTIKEL.pdf
 		if (item.language == "ger" || !item.language) {
@@ -241,34 +282,20 @@ function doExport() {
 		}
 		
 		var i = 0, content, creator;
-		while (item.creators.length > 0) {
+		while (item.creators.length>0) {
 			creator = item.creators.shift();
-			if (creator.firstName && nameMapping[creator.lastName + ", " + creator.firstName]) {
-				content = nameMapping[creator.lastName + ", " + creator.firstName];
-			}
-			else if (nachnameMapping[creator.lastName]) {
-				content = nachnameMapping[creator.lastName];
-			}
-			else {
-				content = creator.lastName + (creator.firstName ? ", " + creator.firstName : "");
-			}
 			if (creator.creatorType == "author") {
-				content += "$BVerfasserIn$4aut";
+					content = creator.lastName + (creator.firstName ? ", " + creator.firstName : "");
+				}
+				if (i === 0) {
+					writeLine("3000", content + "\n");
+					titleStatement += "$h" + (creator.firstName ? creator.firstName + " " : "") + creator.lastName;
+				} else {
+					writeLine("3010", content + "\n");
+				}
+				i++;
 			}
-			else if (creator.creatorType == "editor") {
-				content += "$BHerausgeberIn$4edt";
-			}
-			if (i === 0) {
-				writeLine("3000", content);
-				titleStatement += "$h" + (creator.firstName ? creator.firstName + " " : "") + creator.lastName;
-			}
-			else {
-				writeLine("3010", content);
-				titleStatement += ", " + (creator.firstName ? creator.firstName + " " : "") + creator.lastName;
-			}
-			i++;
-		}
-		
+	
 		writeLine("4000", titleStatement);
 		
 		// Ausgabe --> 4020
@@ -382,6 +409,9 @@ function doExport() {
 		if (ssgNummer) {
 			writeLine("5056", ssgNummer);
 		}
+		
+		// Lokaldatensatz generieren
+		writeLine("E* l01", "\n" + "7100 $B" + "hier Bibliothekssiegel" + "$a");
 		
 	}
 	outputText += "\n";
