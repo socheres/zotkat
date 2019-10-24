@@ -1,4 +1,3 @@
-/* jshint ignore:start */
 {
 	"translatorID": "ce0ab080-7d72-4fa3-ab4b-4bd8950f3379",
 	"label": "MARC21XML",
@@ -15,7 +14,6 @@
 	"browserSupport": "g",
 	"lastUpdated": "2014-09-07 12:58:51"
 }
-/* jshint ignore:end */
 
 // DISCLAIMER:
 // There are different cataloguing rules, specification of MARC dialects,
@@ -191,7 +189,7 @@ function doExport() {
 		}
 		
 		currentFieldNode = mapProperty(recordNode, "datafield",  {"tag" : "040", "ind1" : " ", "ind2" : " " } , true  );
-		mapProperty(currentFieldNode, "subfield",  {"code" : "c"} , 'Zotero' );//not strictly a Marc organization code, but we should mention the Zotero as the 'cataloguing tool' somewhere and here is a good place and is implicitely refered because of the 'u' in 008/37
+		mapProperty(currentFieldNode, "subfield",  {"code" : "c"} , 'Zotero' );//not strictly a Marc organization code, but we should mention the Zotero as the 'cataloguing tool' somewhere and here is a good place and is implicitely referred because of the 'u' in 008/37
 		
 		if (item.language) {
 			currentFieldNode = mapProperty(recordNode, "datafield",  {"tag" : "041", "ind1" : " ", "ind2" : " " } , true  );
@@ -366,11 +364,22 @@ function doExport() {
 			mapProperty(currentFieldNode, "subfield",  {"code" : "7"} , subfieldCode );
 			mapProperty(currentFieldNode, "subfield",  {"code" : "t"} , item.publicationTitle );
 			var descriptionArray = [];
-			if (item.volume) descriptionArray.push(item.volume);
-			if (item.issue) descriptionArray.push(item.issue);
-			if (item.pages) descriptionArray.push(item.pages);
-			mapProperty(currentFieldNode, "subfield",  {"code" : "h"} , descriptionArray.join(', ') );
+			var siciDescription = ""; //https://en.wikipedia.org/wiki/Serial_Item_and_Contribution_Identifier
+			if (item.volume) {
+				descriptionArray.push(item.volume);
+				siciDescription += item.volume;
+			}
+			if (item.issue) {
+				descriptionArray.push(item.issue);
+				siciDescription += ":" + item.issue;
+			}
+			if (item.pages) {
+				descriptionArray.push(item.pages);
+				siciDescription += "<" + parseInt(item.pages);
+			}
+			mapProperty(currentFieldNode, "subfield",  {"code" : "g"} , descriptionArray.join(', ') );
 			mapProperty(currentFieldNode, "subfield",  {"code" : "p"} , item.journalAbbreviation );
+			mapProperty(currentFieldNode, "subfield",  {"code" : "q"} , siciDescription );
 			mapProperty(currentFieldNode, "subfield",  {"code" : "x"} , item.ISSN );
 			//maybe move some other fields if journalArticle?
 		}
@@ -393,7 +402,7 @@ function doExport() {
 		//datafields: 12 characters in the directory + 2 indicators + 1 field terminator
 		//subfields: 1 subfield code + 1 subfield terminator
 
-		//base adress of data starts after the leader and the directory
+		//base address of data starts after the leader and the directory
 		var baseAdressData = 24+countFields.controlfield*12+countFields.datafield*12+1;
 
 		
