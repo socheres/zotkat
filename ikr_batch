@@ -41,7 +41,7 @@ var issn_to_keyword_field = {};
 var issn_to_language_code = {};
 var issn_to_license = {};
 var issn_to_physical_form = {};
-var issn_to_ssg = {};
+var issn_to_ssg_zotkat = {};
 var issn_to_superior_ppn = {};
 var issn_to_volume = {};
 var language_to_language_code = {};
@@ -148,8 +148,8 @@ function populateISSNMaps(mapData, url) {
         case "ISSN_to_physical_form.map":
             issn_to_physical_form = temp;
             break;
-        case "ISSN_to_SSG.map":
-            issn_to_ssg = temp;
+        case "ISSN_to_SSG_zotkat.map":
+            issn_to_ssg_zotkat = temp;
             break;
         case "ISSN_to_superior_ppn.map":
             issn_to_superior_ppn = temp;
@@ -260,8 +260,8 @@ function performExport() {
 			item.language = issn_to_language_code.get(item.ISSN);
 			Z.debug("Found lang:" + item.language);
 		}
-		if (issn_to_ssg.get(item.ISSN) !== undefined) {
-			SsgField = issn_to_ssg.get(item.ISSN);
+		if (issn_to_ssg_zotkat.get(item.ISSN) !== undefined) {
+			SsgField = issn_to_ssg_zotkat.get(item.ISSN);
 			Z.debug("Found ssg:" + SsgField);
 		}
 		if (!item.volume && issn_to_volume.get(item.ISSN) !== undefined) {
@@ -614,7 +614,7 @@ function performExport() {
 			
 			//Schlagwörter aus einem Thesaurus (Fremddaten) --> 5520 (oder alternativ siehe Mapping)
 			if (item.extra){
-				var parts = item.extra.split(";");
+				var parts = item.extra.split("@");
 					for (index in parts){
 					addLine(currentItemId, "\\n5520", "|s|" + parts[index].trim().replace('#r', 'Rechtssprechung').replace('#n','Normen'));
 				}
@@ -625,18 +625,18 @@ function performExport() {
                 var codeBase = issn_to_keyword_field.get(item.ISSN);
                 for (i=0; i<item.tags.length; i++) {
                     var code = codeBase + i;
-                    addLine(currentItemId, code, "!" + item.tags[i].tag.replace(/\s?--\s?/g, '; ') + "!");
+                    addLine(currentItemId, code, "!" + item.tags[i].tag.replace(/\s?--\s?/g, '@ ') + "!");
                 }
             } else {
                 for (i=0; i<item.tags.length; i++) {
-                    addLine(currentItemId, "\\n5580", "!" + ZU.unescapeHTML(item.tags[i].tag.replace(/\s?--\s?/g, '; ')) + "!");
+                    addLine(currentItemId, "\\n5580", "!" + ZU.unescapeHTML(item.tags[i].tag.replace(/\s?--\s?/g, '@ ')) + "!");
                 }
             }
 			//notes > IxTheo-Notation K10plus: 6700 wird hochgezählt und nicht wiederholt, inkrementell ab z.B. 6800, 6801, 6802 etc.
 			if (item.notes) {
 				for (i in item.notes) {
 					var note = ZU.unescapeHTML(item.notes[i].note)
-                    var re = /\s*,\s*/;
+                    var re = /\s*@\s*/;
 					var notation_splits = note.split(re);
                     for (i in notation_splits) {
                         var notation = notation_splits[i].toLowerCase();
@@ -651,7 +651,7 @@ function performExport() {
 				}
 			}
 
-			addLine(currentItemId, '\\nE* l01\\n7100$Jn\\n8012 ixzs$aixzo");\napplication.activeWindow.pressButton("Enter");\n\n', ""); //K10plus:das "j" in 7100 $jn wird jetzt groß geschrieben, also $Jn / aus 8002,  dem Feld für die lokalen Abrufzeichen, wird 8012/ 8012 mehrere Abrufzeichen werden durch $a getrennt, nicht wie bisher durch Semikolon. Also: 8012 ixzs$aixzo
+			addLine(currentItemId, '\\nE* l01\\n7100$Jn\\n8012 mxzk");\napplication.activeWindow.pressButton("Enter");\n\n', ""); //K10plus:das "j" in 7100 $jn wird jetzt groß geschrieben, also $Jn / aus 8002,  dem Feld für die lokalen Abrufzeichen, wird 8012/ 8012 mehrere Abrufzeichen werden durch $a getrennt, nicht wie bisher durch Semikolon. Also: 8012 ixzs$aixzo
         }
     }
 
@@ -670,7 +670,7 @@ function doExport() {
             zts_enhancement_repo_url + "ISSN_to_language_code.map",
             zts_enhancement_repo_url + "ISSN_to_licence.map",
             zts_enhancement_repo_url + "ISSN_to_physical_form.map",
-            zts_enhancement_repo_url + "ISSN_to_SSG.map",
+            zts_enhancement_repo_url + "ISSN_to_SSG_zotkat.map",
             zts_enhancement_repo_url + "ISSN_to_superior_ppn.map",
             zts_enhancement_repo_url + "ISSN_to_volume.map",
             zts_enhancement_repo_url + "language_to_language_code.map",
