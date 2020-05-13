@@ -210,7 +210,7 @@ async function processDocumentsCustom (url, processor, processorParams, onDone, 
     }
 };
 
-//replace all ASCII codes bigger then 128
+//Generate Unicode escapes for all non-ASCII characters.
 
 function EscapeNonASCIICharacters(unescaped_string) {
     let escaped_string = "";
