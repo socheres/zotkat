@@ -232,7 +232,7 @@ function addLine(itemid, code, value) {
 	value = EscapeNonASCIICharacters(value);
 
     //Zeile zusammensetzen
-    var line = code + " " + value;
+    var line = code + " " + value.replace(/"/g, '\\"').replace(/“/g, '\\"').replace(/”/g, '\\"').replace(/„/g, '\\"');
     itemsOutputCache[itemid].push(line);
 }
 
