@@ -246,16 +246,21 @@ function performExport() {
 		var physicalForm = "";//0500 Position 1
 		var licenceField = ""; // 0500 Position 4 only for Open Access Items; http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=kat&val=4085&regelwerk=RDA&verbund=SWB
 		var SsgField = "";
-        var superiorPPN = "";
-        var journalTitlePPN = "";
+        	var superiorPPN = "";
+        	var journalTitlePPN = "";
+		var issn_to_language = "";
 		
 		if (!item.ISSN)
 				item.ISSN = "";
 		item.ISSN = ZU.cleanISSN(item.ISSN);
 		Z.debug("Item ISSN: " + item.ISSN);
 		//enrich items based on their ISSN
-		if (!item.language && issn_to_language_code.get(item.ISSN) !== undefined) {
+		if (issn_to_language_code.get(item.ISSN) !== undefined) {
 			item.language = issn_to_language_code.get(item.ISSN);
+			Z.debug("Found lang:" + item.language);
+		}
+		if (language_to_language_code.get(item.ISSN) !== undefined) {
+			item.language = language_to_language_code.get(item.ISSN);
 			Z.debug("Found lang:" + item.language);
 		}
 		if (issn_to_ssg_zotkat.get(item.ISSN) !== undefined) {
@@ -377,9 +382,9 @@ function performExport() {
 		}*/
 
         //item.language --> 1500 Sprachcodes
-        if (item.language) {
-            if (language_to_language_code.get(item.language)) {
-                item.language = language_to_language_code.get(item.language);
+	if (item.language) {
+            if (issn_to_language_code.get(item.language)) {
+                item.language = issn_to_language_code.get(item.language);
             }
             addLine(currentItemId, "1500", item.language);
         } else {
@@ -615,11 +620,11 @@ function performExport() {
                 var codeBase = issn_to_keyword_field.get(item.ISSN);
                 for (i=0; i<item.tags.length; i++) {
                     var code = codeBase + i;
-                    addLine(currentItemId, code, "|s|" + item.tags[i].tag.replace(/\s?--\s?/g, '; '));
+                    addLine(currentItemId, code, "|s|" + item.tags[i].tag.replace(/\s?--\s?/g, '; ').replace((/^\w/gi,function(m){return m.toUpperCase();})));
                 }
             } else {
                 for (i=0; i<item.tags.length; i++) {
-                    addLine(currentItemId, "5520", "|s|" + ZU.unescapeHTML(item.tags[i].tag.replace(/\s?--\s?/g, '; ')));
+                    addLine(currentItemId, "5520", "|s|" + ZU.unescapeHTML(item.tags[i].tag.replace(/\s?--\s?/g, '; ')).replace((/^\w/gi,function(m){return m.toUpperCase();})));
                 }
             }
 			//notes > IxTheo-Notation K10plus: 6700 wird hochgezählt und nicht wiederholt, inkrementell ab z.B. 6800, 6801, 6802 etc.
