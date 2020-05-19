@@ -265,14 +265,19 @@ function performExport() {
 		var SsgField = "";
 		var superiorPPN = "";
 		var journalTitlePPN = "";
+		var issn_to_language = "";
 		
 		if (!item.ISSN)
 				item.ISSN = "";
 		item.ISSN = ZU.cleanISSN(item.ISSN);
 		Z.debug("Item ISSN: " + item.ISSN);
 		//enrich items based on their ISSN
-		if (!item.language && issn_to_language_code.get(item.ISSN) !== undefined) {
+		if (issn_to_language_code.get(item.ISSN) !== undefined) {
 			item.language = issn_to_language_code.get(item.ISSN);
+			Z.debug("Found lang:" + item.language);
+		}
+		if (language_to_language_code.get(item.ISSN) !== undefined) {
+			item.language = language_to_language_code.get(item.ISSN);
 			Z.debug("Found lang:" + item.language);
 		}
 		if (issn_to_ssg_zotkat.get(item.ISSN) !== undefined) {
@@ -395,8 +400,8 @@ function performExport() {
 		
         //item.language --> 1500 Sprachcodes
         if (item.language) {
-            if (language_to_language_code.get(item.language)) {
-                item.language = language_to_language_code.get(item.language);
+            if (issn_to_language_code.get(item.language)) {
+                item.language = issn_to_language_code.get(item.language);
             }
             addLine(currentItemId, "\\n1500", item.language);
         } else {
