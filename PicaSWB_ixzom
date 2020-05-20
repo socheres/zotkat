@@ -246,7 +246,7 @@ function performExport() {
 		var physicalForm = "";//0500 Position 1
 		var licenceField = ""; // 0500 Position 4 only for Open Access Items; http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=kat&val=4085&regelwerk=RDA&verbund=SWB
 		var SsgField = "";
-        	var superiorPPN = "";
+		var superiorPPN = "";
         	var journalTitlePPN = "";
 		var issn_to_language = "";
 		
@@ -367,10 +367,12 @@ function performExport() {
         }*/
 
         //1131 Art des Inhalts
-        if (item.itemType == "magazineArticle") {
-            addLine(currentItemId, "1131", "!106186019!");
-        }
-
+        for (i=0; i<item.tags.length; i++) {
+			if (item.tags[i].tag.match(/Book (R|r)eviews?/)) {
+				addLine(currentItemId, "1131", "!106186019!");
+			}
+		}
+		
         // 1140 Veröffentlichungsart und Inhalt http://swbtools.bsz-bw.de/winibwhelp/Liste_1140.htm K10plus:1140 "uwre" entfällt. Das Feld wird folglich auch nicht mehr benötigt. Es sei denn es handelt sich um eines der folgenden Dokumente: http://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&val=1140&kattype=Standard
         /*if (item.itemType == "magazineArticle") {
             addLine(currentItemId, "1140", "uwre");
@@ -407,7 +409,7 @@ function performExport() {
                 addLine(currentItemId, "2053", item.DOI);
             }
         }
-
+	
         //Autoren --> 3000, 3010
         //Titel, erster Autor --> 4000
         var titleStatement = "";
