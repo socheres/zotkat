@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 2,
 	"browserSupport": "gcs",
-	"lastUpdated": "2020-05-12 14:00:00"
+	"lastUpdated": "2020-06-03 18:01:00"
 }
 
 
@@ -213,7 +213,6 @@ async function processDocumentsCustom (url, processor, processorParams, onDone, 
 };
 
 function addLine(itemid, code, value) {
-
     //Zeile zusammensetzen
     var line = code + " " + value;
     itemsOutputCache[itemid].push(line);
@@ -246,8 +245,8 @@ function performExport() {
 		var physicalForm = "";//0500 Position 1
 		var licenceField = ""; // 0500 Position 4 only for Open Access Items; http://swbtools.bsz-bw.de/cgi-bin/help.pl?cmd=kat&val=4085&regelwerk=RDA&verbund=SWB
 		var SsgField = "";
-		var superiorPPN = "";
-        	var journalTitlePPN = "";
+        var superiorPPN = "";
+        var journalTitlePPN = "";
 		var issn_to_language = "";
 		
 		if (!item.ISSN)
@@ -384,15 +383,20 @@ function performExport() {
 		}*/
 
         //item.language --> 1500 Sprachcodes
-	if (item.language) {
-            if (issn_to_language_code.get(item.language)) {
-                item.language = issn_to_language_code.get(item.language);
+		if (item.itemType = "journalArticle") {
+            if (language_to_language_code.get(item.language)) {
+                item.language = language_to_language_code.get(item.language);
             }
             addLine(currentItemId, "1500", item.language);
         } else {
-            addLine(currentItemId, "1500", defaultLanguage);
+			item.language = issn_to_language_code.get(item.language);
+            addLine(currentItemId, "1500", item.language);
         }
+		
 
+		
+		
+		
         //1505 Katalogisierungsquelle
         addLine(currentItemId, "1505", "$erda");
 
@@ -409,7 +413,7 @@ function performExport() {
                 addLine(currentItemId, "2053", item.DOI);
             }
         }
-	
+
         //Autoren --> 3000, 3010
         //Titel, erster Autor --> 4000
         var titleStatement = "";
