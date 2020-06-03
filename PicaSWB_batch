@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 2,
 	"browserSupport": "gcs",
-	"lastUpdated": "2020-05-12 16:43:00"
+	"lastUpdated": "2020-06-02 18:01:00"
 }
 
 // Zotero Export Translator für das Pica Intern Format
@@ -384,9 +384,11 @@ function performExport() {
         }*/
 
         //1131 Art des Inhalts
-        if (item.itemType == "magazineArticle") {
-            addLine(currentItemId, "\\n1131", "!106186019!");
-        }
+        for (i=0; i<item.tags.length; i++) {
+			if (item.tags[i].tag.match(/Book (R|r)eviews?/)) {
+				addLine(currentItemId, "1131", "!106186019!");
+			}
+		}
 
         // 1140 Veröffentlichungsart und Inhalt http://swbtools.bsz-bw.de/winibwhelp/Liste_1140.htm K10plus:1140 "uwre" entfällt. Das Feld wird folglich auch nicht mehr benötigt. Es sei denn es handelt sich um eines der folgenden Dokumente: http://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&val=1140&kattype=Standard
         /*if (item.itemType == "magazineArticle") {
@@ -399,14 +401,16 @@ function performExport() {
 		}*/
 		
         //item.language --> 1500 Sprachcodes
-        if (item.language) {
-            if (issn_to_language_code.get(item.language)) {
-                item.language = issn_to_language_code.get(item.language);
+		if (item.itemType = "journalArticle") {
+            if (language_to_language_code.get(item.language)) {
+                item.language = language_to_language_code.get(item.language);
             }
             addLine(currentItemId, "\\n1500", item.language);
         } else {
-            addLine(currentItemId, "\\n1500", defaultLanguage);
+			item.language = issn_to_language_code.get(item.language);
+            addLine(currentItemId, "\\n1500", item.language);
         }
+		
 
         //1505 Katalogisierungsquelle
         addLine(currentItemId, "\\n1505", "$erda");
